@@ -1,0 +1,6 @@
+{
+  "name": "EKAM — Business Network & Spatial Hub",
+  "description": "Redesigned EKAM business networking, referral management, chapter operations, and interactive 3D chapter constellation experience.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

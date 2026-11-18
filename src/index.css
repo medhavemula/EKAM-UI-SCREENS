@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --ekam-orange: #D85D27;
+    --ekam-deep-orange: #BE4D14;
+    --ekam-navy: #123142;
+    --ekam-navy-deep: #0B1F2B;
+    --ekam-indigo: #3B2CFF;
+    --ekam-bg-light: #FAFAFC;
+    --ekam-bg-dark: #0B0B0F;
+    --ekam-surface-light: #FFFFFF;
+    --ekam-surface-dark: #151519;
+  }
+
+  html {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    text-wrap: balance;
+  }
+
+  .font-mono-tabular {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom subtle scrollbars for mobile preview & feed lists */
+.ekam-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.ekam-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ekam-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+.dark .ekam-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.22);
+}
+
+@keyframes ekam-beam-drift-a {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0) scale(1);
+    opacity: 0.82;
+  }
+  50% {
+    transform: translate3d(-10px, 3px, 0) scale(1.02, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes ekam-beam-drift-b {
+  0%, 100% {
+    transform: translate3d(-4px, 0px, 0);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translate3d(8px, -2px, 0);
+    opacity: 1;
+  }
+}
+
+.animate-header-beam-slow {
+  transform-box: view-box;
+  transform-origin: 75% 20%;
+  animation: ekam-beam-drift-a 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-header-beam-counter {
+  transform-box: view-box;
+  transform-origin: 85% 30%;
+  animation: ekam-beam-drift-b 24s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
