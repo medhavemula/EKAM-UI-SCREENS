@@ -216,9 +216,9 @@ export function ProfessionalHomeScreen({
                 whileTap={reducedMotion ? undefined : { scale: 0.94 }}
                 onClick={() => onNavigate('prof_write_post')}
                 aria-label="Create professional post"
-                className="relative z-30 w-[48px] h-[48px] rounded-full bg-[radial-gradient(circle_at_32%_28%,rgba(238,150,98,0.78)_0%,rgba(190,96,48,0.72)_60%,rgba(142,68,32,0.82)_100%)] backdrop-blur-md text-white border border-[#F8C29B]/55 shadow-[0_6px_20px_rgba(0,0,0,0.35),inset_0_1px_3px_rgba(255,255,255,0.38)] flex items-center justify-center cursor-pointer shrink-0"
+                className="relative z-30 w-[48px] h-[48px] rounded-full bg-[radial-gradient(circle_at_30%_25%,rgba(255,154,66,0.94)_0%,rgba(255,107,26,0.88)_55%,rgba(234,82,12,0.92)_100%)] backdrop-blur-md text-white border border-[#FFD1A8]/65 shadow-[0_6px_16px_rgba(0,0,0,0.28),inset_0_1px_3px_rgba(255,255,255,0.4)] flex items-center justify-center cursor-pointer shrink-0"
               >
-                <Plus className="w-6 h-6 text-white" strokeWidth={2} />
+                <Plus className="w-6 h-6 text-white" strokeWidth={2.2} />
               </motion.button>
             )}
           </AnimatePresence>
@@ -412,7 +412,7 @@ export function ProfessionalHomeScreen({
               variants={fadeInUpVariants}
               className={`${cardClass} p-2.5 flex items-center gap-2.5`}
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0D2331] via-[#123142] to-[#1A465C] text-white font-display text-xs font-bold flex items-center justify-center shrink-0 ring-2 ring-slate-100 dark:ring-white/10">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] text-white font-display text-xs font-bold flex items-center justify-center shrink-0 ring-2 ring-slate-100 dark:ring-white/10">
                 {user.initials}
               </div>
               <button
@@ -492,7 +492,7 @@ export function ProfessionalHomeScreen({
                             <div
                               className={`w-11 h-11 rounded-full flex items-center justify-center font-display text-[13px] font-bold shrink-0 ${
                                 isSelf
-                                  ? 'bg-gradient-to-br from-[#0D2331] via-[#123142] to-[#173E52] text-[#F38B1E]'
+                                  ? 'bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] text-[#FFB057]'
                                   : 'bg-[#D6F3DF] text-[#156534] dark:bg-emerald-500/20 dark:text-emerald-300'
                               }`}
                             >
@@ -546,7 +546,7 @@ export function ProfessionalHomeScreen({
 
                         {/* Media Presentation */}
                         {post.hasMedia && (
-                          <div className="rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 bg-gradient-to-br from-[#0D2331] via-[#1B4965] to-[#F4A261]">
+                          <div className="rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#F4A261]">
                             <div className="relative h-40 w-full p-4 flex flex-col justify-end text-white bg-[radial-gradient(circle_at_30%_35%,rgba(253,224,71,0.32),rgba(14,116,144,0.45)_55%,rgba(7,20,38,0.85)_100%)]">
                               <div className="inline-flex items-center gap-1.5 self-start rounded-full bg-black/35 backdrop-blur-md px-2.5 py-1 text-[10.5px] font-semibold text-amber-200 border border-white/15">
                                 <Building2 className="w-3 h-3 text-[#FB923C]" />
@@ -751,8 +751,8 @@ export function ProfessionalHomeScreen({
             <button
               type="button"
               onClick={() => setConnFilter('all')}
-              className={`relative rounded-[22px] bg-gradient-to-br from-[#0D2331] via-[#123142] to-[#1A465E] p-4 text-left text-white overflow-hidden shadow-md active:scale-[0.98] transition-all cursor-pointer ${
-                connFilter === 'all' ? 'ring-2 ring-[#123142] ring-offset-2 ring-offset-[#F5F6FA] dark:ring-offset-[#0B0D14]' : ''
+              className={`relative rounded-[22px] bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] border border-sky-200/25 p-4 text-left text-white overflow-hidden shadow-md active:scale-[0.98] transition-all cursor-pointer ${
+                connFilter === 'all' ? 'ring-2 ring-[#1E4B63] ring-offset-2 ring-offset-[#F5F6FA] dark:ring-offset-[#0B0D14]' : ''
               }`}
             >
               <ArrowDownRight
@@ -761,11 +761,11 @@ export function ProfessionalHomeScreen({
                 strokeWidth={2.2}
               />
               <div className="relative z-10 space-y-5">
-                <div className="w-8 h-8 rounded-full bg-white text-[#123142] flex items-center justify-center shadow-xs">
+                <div className="w-8 h-8 rounded-full bg-white text-[#1E4B63] flex items-center justify-center shadow-xs">
                   <Users className="w-4 h-4" strokeWidth={2.1} />
                 </div>
                 <div>
-                  <div className="text-[11px] font-medium text-slate-300">Connected</div>
+                  <div className="text-[11px] font-medium text-sky-100/85">Connected</div>
                   <div className="font-display text-lg font-bold tabular-nums mt-0.5">
                     {connectedMembers.length} Members
                   </div>
@@ -845,7 +845,7 @@ export function ProfessionalHomeScreen({
                   onClick={() => setConnFilter(f.id)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                     selected
-                      ? 'bg-[#123142] text-white dark:bg-[#D85D27] dark:text-white shadow-xs'
+                      ? 'bg-[#1E4B63] text-white dark:bg-[#D85D27] dark:text-white shadow-xs'
                       : 'bg-white dark:bg-white/[0.06] text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/[0.1]'
                   }`}
                 >
@@ -950,7 +950,7 @@ export function ProfessionalHomeScreen({
           <motion.div variants={fadeInUpVariants} className={`${cardClass} p-4.5 space-y-4`}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0D2331] via-[#123142] to-[#173E52] text-[#F38B1E] flex items-center justify-center font-display text-lg font-bold shrink-0 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] text-[#FFB057] flex items-center justify-center font-display text-lg font-bold shrink-0 shadow-sm">
                   {user.businessName.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0">
@@ -997,18 +997,18 @@ export function ProfessionalHomeScreen({
 
           {/* 2-Column Dual-Contrast Bento Summary */}
           <motion.div variants={fadeInUpVariants} className="grid grid-cols-2 gap-3">
-            <div className="relative rounded-[22px] bg-gradient-to-br from-[#0D2331] via-[#123142] to-[#1A465E] p-4 text-white overflow-hidden shadow-md">
+            <div className="relative rounded-[22px] bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] border border-sky-200/25 p-4 text-white overflow-hidden shadow-md">
               <MapPin
                 aria-hidden="true"
                 className="pointer-events-none absolute -right-2 -bottom-2 w-16 h-16 text-white/10"
                 strokeWidth={1.8}
               />
               <div className="relative z-10 space-y-3">
-                <div className="w-8 h-8 rounded-full bg-white text-[#123142] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-white text-[#1E4B63] flex items-center justify-center">
                   <MapPin className="w-4 h-4" strokeWidth={2} />
                 </div>
                 <div>
-                  <div className="text-[11px] text-slate-300">Headquarters</div>
+                  <div className="text-[11px] text-sky-100/85">Headquarters</div>
                   <div className="font-display text-sm font-bold truncate mt-0.5">
                     {user.headquarters || user.region}
                   </div>
@@ -1237,7 +1237,7 @@ export function WritePostScreen({
           <div className={`${cardClass} p-4 flex items-center justify-between gap-3`}>
             <div className="flex items-center gap-3.5 min-w-0">
               <div className="relative shrink-0">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0D2331] via-[#123142] to-[#173E52] text-[#F38B1E] flex items-center justify-center font-display text-sm font-bold shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] text-[#FFB057] flex items-center justify-center font-display text-sm font-bold shadow-sm">
                   {user.initials}
                 </div>
                 <span

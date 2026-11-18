@@ -821,17 +821,25 @@ export function SearchMembersScreen({
                 <button
                   type="button"
                   onClick={() => onStartChat(m)}
-                  className="px-3 py-1.5 rounded-lg bg-[#D85D27]/12 text-[#D85D27] text-xs font-semibold hover:bg-[#D85D27]/20 cursor-pointer shrink-0"
+                  className="px-3.5 py-1.5 rounded-full bg-emerald-500/12 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 text-xs font-semibold hover:bg-emerald-500/20 dark:hover:bg-emerald-500/28 cursor-pointer whitespace-nowrap shrink-0 transition-colors"
                 >
                   Message
+                </button>
+              ) : m.status === 'sent' ? (
+                <button
+                  type="button"
+                  onClick={() => onConnect(m.id)}
+                  className="px-3.5 py-1.5 rounded-full bg-red-500/12 dark:bg-red-500/20 text-red-600 dark:text-red-300 border border-red-500/25 text-xs font-semibold hover:bg-red-500/20 dark:hover:bg-red-500/28 cursor-pointer whitespace-nowrap shrink-0 transition-colors"
+                >
+                  Pending
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={() => onConnect(m.id)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/8 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-white/14 cursor-pointer shrink-0"
+                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#FF7A29] to-[#D85D27] hover:from-[#F26B1D] hover:to-[#BE4D14] active:scale-[0.97] text-white text-xs font-semibold shadow-[0_4px_12px_-2px_rgba(216,93,39,0.42)] cursor-pointer whitespace-nowrap shrink-0 transition-all"
                 >
-                  {m.status === 'sent' ? 'Pending' : 'Connect'}
+                  Connect
                 </button>
               )}
             </motion.div>

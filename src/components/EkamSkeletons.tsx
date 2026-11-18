@@ -9,7 +9,7 @@ type SkeletonTone = 'neutral' | 'copper' | 'navy' | 'teal' | 'dark-surface';
 const TONE_BASE_CLASSES: Record<SkeletonTone, string> = {
   neutral: 'bg-slate-200/80 dark:bg-white/[0.08]',
   copper: 'bg-[#D85D27]/22 dark:bg-[#F38B1E]/22',
-  navy: 'bg-[#123142]/16 dark:bg-sky-300/18',
+  navy: 'bg-[#1E4B63]/20 dark:bg-sky-300/20',
   teal: 'bg-[#15647B]/20 dark:bg-cyan-300/18',
   'dark-surface': 'bg-white/15',
 };
@@ -197,7 +197,7 @@ export function DashboardSkeleton({ reducedMotion = false }: { reducedMotion?: b
         {/* Dark 3D Constellation Card */}
         <motion.div
           variants={itemVariants}
-          className="rounded-[24px] bg-gradient-to-br from-[#0E3548] via-[#0A2533] to-[#061822] p-4.5 border border-white/10 flex items-center justify-between gap-3"
+          className="rounded-[24px] bg-gradient-to-br from-[#245670] via-[#1B465D] to-[#15394D] p-4.5 border border-sky-200/20 flex items-center justify-between gap-3"
         >
           <div className="flex-1 space-y-2.5">
             <EkamSkeletonBlock reducedMotion={reducedMotion} tone="copper" className="h-3 w-20 rounded-md" />
@@ -391,7 +391,7 @@ export function BusinessHubSkeleton({ reducedMotion = false }: { reducedMotion?:
 
         {/* Dual Bento Metric Cards (Navy + Copper Glass) */}
         <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3">
-          <div className="rounded-[22px] bg-[#123142]/18 dark:bg-[#123142]/55 border border-[#123142]/22 p-4 space-y-3">
+          <div className="rounded-[22px] bg-[#1E4B63]/20 dark:bg-[#1E4B63]/55 border border-[#1E4B63]/25 p-4 space-y-3">
             <EkamSkeletonBlock reducedMotion={reducedMotion} tone="copper" className="w-10 h-10 rounded-xl" />
             <div className="space-y-1.5">
               <EkamSkeletonBlock reducedMotion={reducedMotion} tone="navy" className="h-4 w-24 rounded-md" />
@@ -475,7 +475,7 @@ export function ProfessionalHubSkeleton({ reducedMotion = false }: { reducedMoti
       >
         {/* Spotlight Split */}
         <motion.div variants={itemVariants} className="grid grid-cols-[1.45fr_1fr] gap-3">
-          <div className="rounded-[22px] bg-[#123142]/15 dark:bg-[#123142]/40 p-4 min-h-[112px] flex flex-col justify-between">
+          <div className="rounded-[22px] bg-[#1E4B63]/18 dark:bg-[#1E4B63]/45 p-4 min-h-[112px] flex flex-col justify-between">
             <EkamSkeletonBlock reducedMotion={reducedMotion} tone="navy" className="h-3 w-20 rounded-md" />
             <EkamSkeletonBlock reducedMotion={reducedMotion} tone="navy" delay={0.08} className="h-4 w-32 rounded-md" />
             <EkamSkeletonBlock reducedMotion={reducedMotion} tone="copper" delay={0.14} className="h-3 w-24 rounded-md" />

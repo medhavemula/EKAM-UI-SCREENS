@@ -7,13 +7,13 @@ import {
   Bell,
   Bookmark,
   Briefcase,
+  Building2,
   Calendar,
   Check,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
   Clock,
-  Compass,
   Heart,
   Link2,
   Mail,
@@ -44,7 +44,6 @@ import {
   UserProfile,
   VisitorItem,
 } from '../../types/ekam';
-import { BusinessCoreStage3D } from '../BusinessCoreStage3D';
 import { EditorialHeaderBackdrop } from '../EditorialHeaderBackdrop';
 import { EmptyStateView, PremiumButton, SectionHeader } from '../EkamBrand';
 import { BusinessHubSkeleton, FeedListSkeleton, SkeletonCrossfade } from '../EkamSkeletons';
@@ -158,7 +157,6 @@ export function BusinessHomeScreen({
   const [p2pLocation, setP2pLocation] = useState('Jubilee Hills Roastery');
   const [attendanceCheckedIn, setAttendanceCheckedIn] = useState(false);
   const [chapterFeedDraft, setChapterFeedDraft] = useState('');
-  const [show3DStageModal, setShow3DStageModal] = useState(false);
 
   const selectSection = (next: BusinessSection) => {
     if (next === section) return;
@@ -247,7 +245,7 @@ export function BusinessHomeScreen({
     'relative rounded-[24px] bg-gradient-to-br from-[#FF7A29] via-[#E55E22] to-[#BE4D14] p-5 text-white border border-[#FFC296]/45 shadow-[0_20px_42px_-12px_rgba(216,93,39,0.48),inset_0_1px_1px_rgba(255,255,255,0.42)] overflow-hidden';
 
   const navyHeroClass =
-    'relative rounded-[24px] bg-gradient-to-br from-[#0B1D2C] via-[#123142] to-[#19455C] p-5 text-white border border-sky-300/20 shadow-[0_18px_38px_-12px_rgba(18,49,66,0.46),inset_0_1px_1px_rgba(255,255,255,0.2)] overflow-hidden';
+    'relative rounded-[24px] bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] p-5 text-white border border-sky-200/25 shadow-[0_18px_38px_-12px_rgba(24,62,83,0.42),inset_0_1px_1px_rgba(255,255,255,0.22)] overflow-hidden';
 
   const glassCardClass =
     'rounded-[22px] bg-white/88 dark:bg-[#131926]/88 backdrop-blur-md border border-[#D85D27]/20 dark:border-[#F38B1E]/22 shadow-[0_16px_36px_-12px_rgba(216,93,39,0.16),0_6px_16px_-6px_rgba(18,49,66,0.1),inset_0_1px_1px_rgba(255,255,255,0.85)] dark:shadow-[0_20px_40px_-14px_rgba(0,0,0,0.72),0_0_24px_-8px_rgba(243,139,30,0.18),inset_0_1px_1px_rgba(255,255,255,0.08)]';
@@ -283,6 +281,19 @@ export function BusinessHomeScreen({
     Math.max(28, p2pSessions.length * 22),
     Math.min(96, 44 + referralsCount * 12),
   ];
+
+  const reportPoints = reportBars.map((val, i) => ({
+    x: Number((4 + i * 12.4).toFixed(1)),
+    y: Number((26 - (Math.min(100, Math.max(15, val)) / 100) * 20).toFixed(1)),
+  }));
+  const trendLinePath = reportPoints.reduce((acc, pt, i, arr) => {
+    if (i === 0) return `M ${pt.x} ${pt.y}`;
+    const prev = arr[i - 1];
+    const midX = Number(((prev.x + pt.x) / 2).toFixed(1));
+    return `${acc} C ${midX} ${prev.y}, ${midX} ${pt.y}, ${pt.x} ${pt.y}`;
+  }, '');
+  const lastReportPt = reportPoints[reportPoints.length - 1];
+  const trendAreaPath = `${trendLinePath} L ${lastReportPt.x} 28 L ${reportPoints[0].x} 28 Z`;
 
   return (
     <PullToRefreshContainer tone="dark" reducedMotion={reducedMotion} onRefresh={onRefresh}>
@@ -349,19 +360,19 @@ export function BusinessHomeScreen({
                       ? 'Add visitor'
                       : 'Book one-to-one'
                 }
-                className="relative z-30 w-[48px] h-[48px] rounded-full bg-[radial-gradient(circle_at_32%_28%,rgba(238,150,98,0.78)_0%,rgba(190,96,48,0.72)_60%,rgba(142,68,32,0.82)_100%)] backdrop-blur-md text-white border border-[#F8C29B]/55 shadow-[0_6px_20px_rgba(0,0,0,0.35),inset_0_1px_3px_rgba(255,255,255,0.38)] flex items-center justify-center cursor-pointer shrink-0"
+                className="relative z-30 w-[48px] h-[48px] rounded-full bg-[radial-gradient(circle_at_30%_25%,rgba(255,154,66,0.94)_0%,rgba(255,107,26,0.88)_55%,rgba(234,82,12,0.92)_100%)] backdrop-blur-md text-white border border-[#FFD1A8]/65 shadow-[0_6px_16px_rgba(0,0,0,0.28),inset_0_1px_3px_rgba(255,255,255,0.4)] flex items-center justify-center cursor-pointer shrink-0"
               >
-                <Plus className="w-6 h-6 text-white" strokeWidth={2} />
+                <Plus className="w-6 h-6 text-white" strokeWidth={2.2} />
               </motion.button>
             </div>
 
-            {/* BOTTOM ROW: Full-Width Rounded Pill Glass Navigation Bar (Opportunities | Network | Chapter) */}
+            {/* BOTTOM ROW: Full-Width Rounded Pill Glass Navigation Bar (Opportunities | Connections | Chapter) */}
             <div className="relative z-20 rounded-full bg-[linear-gradient(90deg,rgba(26,38,58,0.76)_0%,rgba(44,50,68,0.68)_52%,rgba(68,54,62,0.66)_100%)] backdrop-blur-xl border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.28),0_8px_24px_rgba(0,0,0,0.35)] p-1 flex items-center">
               {(
                 [
-                  { id: 'opportunities', label: 'Opportunities', icon: Briefcase, flexClass: 'flex-[1.34_1_0%]' },
-                  { id: 'network', label: 'Network', icon: Users, flexClass: 'flex-[0.92_1_0%]' },
-                  { id: 'chapter', label: 'Chapter', icon: Compass, flexClass: 'flex-[0.92_1_0%]' },
+                  { id: 'opportunities', label: 'Opportunities', icon: Briefcase, flexClass: 'flex-[1.22_1_0%]' },
+                  { id: 'network', label: 'Connections', icon: Users, flexClass: 'flex-[1.18_1_0%]' },
+                  { id: 'chapter', label: 'Chapter', icon: Building2, flexClass: 'flex-[0.86_1_0%]' },
                 ] as const
               ).map((item, index) => {
                 const active = section === item.id;
@@ -371,7 +382,7 @@ export function BusinessHomeScreen({
                     <button
                       type="button"
                       onClick={() => selectSection(item.id)}
-                      className={`relative z-10 min-w-0 ${item.flexClass} min-h-[40px] rounded-full text-[11.5px] sm:text-[12.5px] transition-colors cursor-pointer flex items-center justify-center gap-1.5 px-2.5 ${
+                      className={`relative z-10 min-w-0 ${item.flexClass} min-h-[40px] rounded-full text-[11px] transition-colors cursor-pointer flex items-center justify-center gap-1 px-1.5 ${
                         active ? 'text-[#101828] font-bold' : 'text-white/90 hover:text-white font-medium'
                       }`}
                     >
@@ -389,7 +400,7 @@ export function BusinessHomeScreen({
 
                       <span className="relative z-10 flex items-center justify-center shrink-0">
                         <Icon
-                          className={`w-[14px] h-[14px] ${
+                          className={`w-[13px] h-[13px] ${
                             active ? 'text-[#EA580C]' : 'text-white/85'
                           }`}
                           strokeWidth={1.9}
@@ -460,31 +471,31 @@ export function BusinessHomeScreen({
 
                       <button
                         type="button"
-                        onClick={() => setShow3DStageModal(true)}
-                        title="Open 3D Business Nexus"
-                        className="w-11 h-11 rounded-2xl bg-[#0E2434]/90 hover:bg-[#0B1D2C] border border-white/20 shadow-[0_8px_18px_-4px_rgba(11,29,44,0.45)] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
-                        aria-label="Open 3D Business Stage"
+                        onClick={() => onNavigate('reports')}
+                        title="Open Chapter ROI & Reports"
+                        className="w-11 h-11 rounded-2xl bg-[#1B465D]/95 hover:bg-[#15394D] border border-sky-200/25 shadow-[0_8px_18px_-4px_rgba(11,29,44,0.35)] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                        aria-label="Open Chapter ROI & Reports"
                       >
-                        <Compass className="w-5 h-5 text-[#F38B1E]" />
+                        <BarChart3 className="w-5 h-5 text-[#FFB057]" />
                       </button>
                     </div>
 
-                    {/* Deep EKAM Navy Telemetry Strip inside Orange Hero */}
-                    <div className="relative z-10 mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-[#0E2434]/92 backdrop-blur-md border border-white/15 p-2.5 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]">
+                    {/* Balanced Ocean-Navy Telemetry Strip inside Orange Hero */}
+                    <div className="relative z-10 mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-gradient-to-r from-[#255973] via-[#1E4B63] to-[#183E53] border border-sky-200/25 p-2.5 text-center shadow-[0_8px_20px_-8px_rgba(11,29,44,0.32),inset_0_1px_1px_rgba(255,255,255,0.2)]">
                       <div>
-                        <div className="text-[10px] font-medium text-slate-300">Referrals</div>
+                        <div className="text-[10px] font-medium text-sky-100/85">Referrals</div>
                         <div className="font-display text-sm font-bold text-white tabular-nums mt-0.5">
                           {referralsCount}
                         </div>
                       </div>
-                      <div className="border-x border-white/12">
-                        <div className="text-[10px] font-medium text-slate-300">Business Closed</div>
-                        <div className="font-display text-sm font-bold text-[#F38B1E] font-mono-tabular mt-0.5">
+                      <div className="border-x border-white/15">
+                        <div className="text-[10px] font-medium text-sky-100/85">Business Closed</div>
+                        <div className="font-display text-sm font-bold text-[#FFB057] font-mono-tabular mt-0.5">
                           ₹{(closedBusinessInr / 1000).toFixed(0)}k
                         </div>
                       </div>
                       <div>
-                        <div className="text-[10px] font-medium text-slate-300">Links</div>
+                        <div className="text-[10px] font-medium text-sky-100/85">Links</div>
                         <div className="font-display text-sm font-bold text-white tabular-nums mt-0.5">
                           {connectionsCount}
                         </div>
@@ -495,9 +506,9 @@ export function BusinessHomeScreen({
                       <button
                         type="button"
                         onClick={() => onNavigate('pass_referral')}
-                        className="min-h-[42px] px-2.5 py-2 rounded-xl bg-[#0E2434] hover:bg-[#091926] text-[11.5px] sm:text-xs font-semibold text-white border border-white/15 shadow-[0_10px_20px_-6px_rgba(11,29,44,0.55)] transition-all active:scale-[0.98] cursor-pointer inline-flex items-center justify-center gap-1 whitespace-nowrap"
+                        className="min-h-[42px] px-2.5 py-2 rounded-xl bg-[#1B465D] hover:bg-[#15394D] text-[11.5px] sm:text-xs font-semibold text-white border border-sky-200/25 shadow-[0_10px_20px_-6px_rgba(11,29,44,0.4)] transition-all active:scale-[0.98] cursor-pointer inline-flex items-center justify-center gap-1 whitespace-nowrap"
                       >
-                        <Plus className="w-3.5 h-3.5 text-[#F38B1E] shrink-0" strokeWidth={2.4} />
+                        <Plus className="w-3.5 h-3.5 text-[#FFB057] shrink-0" strokeWidth={2.4} />
                         <span>Pass a Referral</span>
                       </button>
                       <button
@@ -516,14 +527,10 @@ export function BusinessHomeScreen({
                     <button
                       type="button"
                       onClick={() => onNavigate('opportunity')}
-                      className="relative text-left rounded-[22px] bg-gradient-to-br from-[#0D2331] via-[#123142] to-[#1A465E] p-4 text-white border border-sky-300/20 shadow-[0_16px_34px_-12px_rgba(18,49,66,0.48),inset_0_1px_1px_rgba(255,255,255,0.22)] hover:shadow-[0_18px_38px_-10px_rgba(18,49,66,0.58)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden"
+                      className="relative text-left rounded-[22px] bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] p-4 text-white border border-sky-200/25 shadow-[0_16px_34px_-12px_rgba(24,62,83,0.42),inset_0_1px_1px_rgba(255,255,255,0.22)] hover:shadow-[0_18px_38px_-10px_rgba(24,62,83,0.5)] active:scale-[0.98] transition-all cursor-pointer overflow-hidden"
                     >
-                      <div
-                        aria-hidden="true"
-                        className="pointer-events-none absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-[radial-gradient(circle,rgba(243,139,30,0.24)_0%,transparent_70%)]"
-                      />
                       <div className="relative z-10 flex items-center justify-between">
-                        <div className="w-10 h-10 rounded-xl bg-[#F38B1E] text-[#0B1D2C] shadow-[0_6px_14px_-3px_rgba(243,139,30,0.55)] flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-[#F38B1E] text-[#183E53] shadow-[0_6px_14px_-3px_rgba(243,139,30,0.55)] flex items-center justify-center">
                           <Mail className="w-5 h-5" />
                         </div>
                         <ChevronRight className="w-4 h-4 text-white/65" />
@@ -531,7 +538,7 @@ export function BusinessHomeScreen({
                       <div className="relative z-10 mt-3 font-display text-sm font-bold text-white">
                         Referrals
                       </div>
-                      <div className="relative z-10 mt-0.5 text-xs text-slate-300 tabular-nums">
+                      <div className="relative z-10 mt-0.5 text-xs text-sky-100/85 tabular-nums">
                         {givenReferrals.length} given · {receivedReferrals.length} received
                       </div>
                     </button>
@@ -655,61 +662,92 @@ export function BusinessHomeScreen({
                   </motion.div>
 
                   {/* 4. Links (Navy-Glass) & Reports (Copper-Glass) Bento Pair */}
-                  <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3 items-stretch">
                     {/* Links Card */}
                     <button
                       type="button"
                       onClick={() => onNavigate('connections')}
-                      className={`text-left ${navyGlassCardClass} p-4 flex items-center justify-between gap-3 hover:border-[#123142]/45 active:scale-[0.98] transition-all cursor-pointer`}
+                      className={`text-left ${navyGlassCardClass} p-4 flex flex-col justify-between hover:border-[#123142]/45 active:scale-[0.98] transition-all cursor-pointer`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#123142] to-[#1A465E] text-[#F38B1E] shadow-[0_8px_16px_-4px_rgba(18,49,66,0.38)] flex items-center justify-center shrink-0">
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#245670] to-[#183E53] text-[#FFB057] shadow-[0_8px_16px_-4px_rgba(24,62,83,0.34)] flex items-center justify-center shrink-0">
                           <Link2 className="w-5 h-5" />
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-display text-sm font-bold text-[#123142] dark:text-white">
-                            Links
-                          </div>
-                          <div className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 tabular-nums truncate">
-                            {connectionsCount} verified partner links
-                          </div>
+                        <ChevronRight className="w-4 h-4 text-[#123142]/50 dark:text-slate-400 shrink-0" />
+                      </div>
+                      <div className="mt-3">
+                        <div className="font-display text-sm font-bold text-[#123142] dark:text-white">
+                          Links
+                        </div>
+                        <div className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-snug tabular-nums">
+                          {connectionsCount} verified partner links
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-[#123142]/50 dark:text-slate-400 shrink-0" />
                     </button>
 
                     {/* Reports Card with Live EKAM Sparkline */}
                     <button
                       type="button"
                       onClick={() => onNavigate('reports')}
-                      className={`text-left ${copperGlassCardClass} p-4 flex items-center justify-between gap-3 hover:border-[#D85D27]/50 active:scale-[0.98] transition-all cursor-pointer`}
+                      className={`text-left ${copperGlassCardClass} p-4 flex flex-col justify-between hover:border-[#D85D27]/50 active:scale-[0.98] transition-all cursor-pointer`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#FF7A29] to-[#D85D27] text-white shadow-[0_8px_18px_-4px_rgba(216,93,39,0.45)] flex items-center justify-center shrink-0">
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF7A29] to-[#D85D27] text-white shadow-[0_8px_18px_-4px_rgba(216,93,39,0.45)] flex items-center justify-center shrink-0">
                           <BarChart3 className="w-5 h-5" />
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-display text-sm font-bold text-[#123142] dark:text-white">
-                            Reports
-                          </div>
-                          <div className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 truncate">
-                            Chapter ROI &amp; trends
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-end gap-1 h-8 shrink-0" aria-hidden="true">
-                        {reportBars.map((pct, i) => (
-                          <span
-                            key={i}
-                            className={`w-1.5 rounded-full ${
-                              i === reportBars.length - 1
-                                ? 'bg-[#D85D27]'
-                                : 'bg-[#123142]/55 dark:bg-sky-300/55'
-                            }`}
-                            style={{ height: `${Math.max(25, Math.min(100, pct))}%` }}
+                        <svg
+                          viewBox="0 0 72 30"
+                          className="w-[68px] h-7 shrink-0 overflow-visible"
+                          aria-hidden="true"
+                        >
+                          <defs>
+                            <linearGradient id="ekamReportsAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#FF7A29" stopOpacity="0.34" />
+                              <stop offset="100%" stopColor="#D85D27" stopOpacity="0.02" />
+                            </linearGradient>
+                          </defs>
+                          <line
+                            x1="4"
+                            y1="28"
+                            x2="66"
+                            y2="28"
+                            stroke="currentColor"
+                            strokeOpacity="0.16"
+                            strokeWidth="1"
+                            strokeDasharray="2 2"
+                            className="text-[#123142] dark:text-sky-200"
                           />
-                        ))}
+                          <path d={trendAreaPath} fill="url(#ekamReportsAreaGrad)" />
+                          <path
+                            d={trendLinePath}
+                            fill="none"
+                            stroke="#D85D27"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="dark:stroke-[#FF8A42]"
+                          />
+                          <circle
+                            cx={lastReportPt.x}
+                            cy={lastReportPt.y}
+                            r="4.2"
+                            className="fill-[#FF7A29]/25 dark:fill-[#FF8A42]/30"
+                          />
+                          <circle
+                            cx={lastReportPt.x}
+                            cy={lastReportPt.y}
+                            r="2.2"
+                            className="fill-[#D85D27] dark:fill-[#FFB057]"
+                          />
+                        </svg>
+                      </div>
+                      <div className="mt-3">
+                        <div className="font-display text-sm font-bold text-[#123142] dark:text-white">
+                          Reports
+                        </div>
+                        <div className="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-snug">
+                          Chapter ROI &amp; trends
+                        </div>
                       </div>
                     </button>
                   </motion.div>
@@ -719,10 +757,6 @@ export function BusinessHomeScreen({
                     variants={itemVariants}
                     className={`${navyHeroClass} p-4 flex items-center justify-between gap-3`}
                   >
-                    <div
-                      aria-hidden="true"
-                      className="pointer-events-none absolute -right-6 -top-8 w-32 h-32 rounded-full bg-[radial-gradient(circle,rgba(243,139,30,0.28)_0%,transparent_70%)]"
-                    />
                     <div className="relative z-10 min-w-0">
                       <div className="font-display text-sm font-bold text-white">
                         Ready to pass a warm introduction?
@@ -764,7 +798,7 @@ export function BusinessHomeScreen({
                     <button
                       type="button"
                       onClick={() => onNavigate('connections')}
-                      className="relative rounded-[24px] bg-gradient-to-br from-[#0B1D2C] via-[#123142] to-[#1A465E] p-4 text-left text-white border border-sky-300/20 overflow-hidden shadow-[0_18px_36px_-12px_rgba(18,49,66,0.48),inset_0_1px_1px_rgba(255,255,255,0.22)] active:scale-[0.98] transition-all cursor-pointer"
+                      className="relative rounded-[24px] bg-gradient-to-br from-[#245670] via-[#1E4B63] to-[#173E52] p-4 text-left text-white border border-sky-200/25 overflow-hidden shadow-[0_18px_36px_-12px_rgba(24,62,83,0.42),inset_0_1px_1px_rgba(255,255,255,0.22)] active:scale-[0.98] transition-all cursor-pointer"
                     >
                       <Users
                         aria-hidden="true"
@@ -772,11 +806,11 @@ export function BusinessHomeScreen({
                         strokeWidth={1.8}
                       />
                       <div className="relative z-10 space-y-4">
-                        <div className="w-9.5 h-9.5 rounded-xl bg-[#F38B1E] text-[#0B1D2C] shadow-[0_6px_14px_-3px_rgba(243,139,30,0.55)] flex items-center justify-center">
+                        <div className="w-9.5 h-9.5 rounded-xl bg-[#F38B1E] text-[#183E53] shadow-[0_6px_14px_-3px_rgba(243,139,30,0.55)] flex items-center justify-center">
                           <UserCheck className="w-4.5 h-4.5" />
                         </div>
                         <div>
-                          <div className="text-[11px] font-medium text-slate-300">Connections</div>
+                          <div className="text-[11px] font-medium text-sky-100/85">Connections</div>
                           <div className="font-display text-lg font-bold tabular-nums mt-0.5">
                             {connectedMembers.length} Members
                           </div>
@@ -795,7 +829,7 @@ export function BusinessHomeScreen({
                         strokeWidth={1.8}
                       />
                       <div className="relative z-10 space-y-4">
-                        <div className="w-9.5 h-9.5 rounded-xl bg-[#0E2434] text-[#F38B1E] shadow-[0_6px_14px_-3px_rgba(11,29,44,0.45)] flex items-center justify-center">
+                        <div className="w-9.5 h-9.5 rounded-xl bg-[#1E4B63] text-[#FFB057] border border-sky-200/20 shadow-[0_6px_14px_-3px_rgba(24,62,83,0.4)] flex items-center justify-center">
                           <UserPlus className="w-4.5 h-4.5" />
                         </div>
                         <div>
@@ -971,9 +1005,9 @@ export function BusinessHomeScreen({
                                   onStartChat ? onStartChat(m) : onNavigate('messages')
                                 }
                                 aria-label={`Message ${m.name}`}
-                                className="w-9 h-9 rounded-xl bg-[#123142] hover:bg-[#0D2431] text-[#F38B1E] shadow-xs flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+                                className="w-9 h-9 rounded-xl bg-[#1E4B63] hover:bg-[#163C52] text-[#FF922E] shadow-xs flex items-center justify-center shrink-0 cursor-pointer transition-colors"
                               >
-                                <MessageSquare className="w-4 h-4" />
+                                <MessageSquare className="w-4 h-4 fill-current" />
                               </button>
                             )}
                           </div>
@@ -1102,7 +1136,7 @@ export function BusinessHomeScreen({
                       <div className="relative z-10 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3.5 min-w-0">
                           <div className="w-12 rounded-xl overflow-hidden bg-white text-center shrink-0 shadow-[0_6px_14px_-3px_rgba(11,29,44,0.3)]">
-                            <div className="bg-[#0E2434] text-[#F38B1E] text-[10px] font-bold py-0.5">
+                            <div className="bg-[#1E4B63] text-[#FFB057] text-[10px] font-bold py-0.5">
                               {nextMeeting.dayShort}
                             </div>
                             <div className="text-[#123142] font-display text-base font-bold py-1 tabular-nums">
@@ -1129,10 +1163,10 @@ export function BusinessHomeScreen({
                       </div>
                     )}
 
-                    {/* Deep EKAM Navy Attendance Check-In Sub-Panel */}
-                    <div className="relative z-10 rounded-2xl bg-[#0E2434]/92 backdrop-blur-md border border-white/15 p-3 flex items-center justify-between gap-3 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]">
+                    {/* Balanced Ocean-Navy Attendance Check-In Sub-Panel */}
+                    <div className="relative z-10 rounded-2xl bg-gradient-to-r from-[#255973] via-[#1E4B63] to-[#183E53] border border-sky-200/25 p-3 flex items-center justify-between gap-3 shadow-[0_8px_20px_-8px_rgba(11,29,44,0.32),inset_0_1px_1px_rgba(255,255,255,0.2)]">
                       <div className="min-w-0">
-                        <div className="text-[11px] font-semibold uppercase tracking-wider text-[#F38B1E]">
+                        <div className="text-[11px] font-semibold uppercase tracking-wider text-[#FFB057]">
                           Attendance
                         </div>
                         <div className="mt-0.5 text-xs text-white font-medium tabular-nums">
@@ -1177,7 +1211,7 @@ export function BusinessHomeScreen({
                         <button
                           type="button"
                           onClick={() => setShowBookP2PModal(true)}
-                          className="flex-1 py-1.5 rounded-xl bg-[#123142] hover:bg-[#0D2431] text-white text-[11px] font-semibold cursor-pointer transition-colors"
+                          className="flex-1 py-1.5 rounded-xl bg-[#1E4B63] hover:bg-[#163C52] text-white text-[11px] font-semibold cursor-pointer transition-colors"
                         >
                           Book P2P
                         </button>
@@ -1197,13 +1231,9 @@ export function BusinessHomeScreen({
                       onClick={() => onNavigate('many_to_one')}
                       className={`text-left ${navyHeroClass} p-4 flex flex-col justify-between gap-3 hover:border-sky-300/40 active:scale-[0.98] transition-all cursor-pointer`}
                     >
-                      <div
-                        aria-hidden="true"
-                        className="pointer-events-none absolute -right-5 -bottom-5 w-20 h-20 rounded-full bg-[radial-gradient(circle,rgba(243,139,30,0.25)_0%,transparent_70%)]"
-                      />
                       <div className="relative z-10">
                         <div className="flex items-center justify-between">
-                          <div className="w-10 h-10 rounded-xl bg-[#F38B1E] text-[#0B1D2C] shadow-[0_6px_14px_-3px_rgba(243,139,30,0.5)] flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-xl bg-[#F38B1E] text-[#183E53] shadow-[0_6px_14px_-3px_rgba(243,139,30,0.5)] flex items-center justify-center">
                             <Users className="w-5 h-5" />
                           </div>
                           <ChevronRight className="w-4 h-4 text-white/65" />
@@ -1211,11 +1241,11 @@ export function BusinessHomeScreen({
                         <div className="mt-3 font-display text-sm font-bold text-white">
                           Many To One
                         </div>
-                        <div className="text-[11.5px] text-slate-300 mt-0.5">
+                        <div className="text-[11.5px] text-sky-100/85 mt-0.5">
                           Power-team M2O circles
                         </div>
                       </div>
-                      <span className="relative z-10 text-[11px] font-semibold text-[#F38B1E]">
+                      <span className="relative z-10 text-[11px] font-semibold text-[#FFB057]">
                         Propose or join M2O →
                       </span>
                     </button>
@@ -1225,7 +1255,7 @@ export function BusinessHomeScreen({
                   <motion.div variants={itemVariants} className={`${navyGlassCardClass} p-4 space-y-3`}>
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="w-7 h-7 rounded-lg bg-[#123142] text-[#F38B1E] flex items-center justify-center">
+                        <span className="w-7 h-7 rounded-lg bg-[#1E4B63] text-[#FFB057] flex items-center justify-center">
                           <Ticket className="w-4 h-4" />
                         </span>
                         <h2 className="font-display text-sm font-bold text-[#123142] dark:text-white">
@@ -1264,7 +1294,7 @@ export function BusinessHomeScreen({
                               onClick={() => onToggleRsvp(ev.id)}
                               className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 cursor-pointer transition-colors ${
                                 ev.rsvped
-                                  ? 'bg-[#123142] text-white'
+                                  ? 'bg-[#1E4B63] text-white'
                                   : 'bg-[#D85D27] hover:bg-[#BE4D14] text-white shadow-[0_4px_12px_-2px_rgba(216,93,39,0.4)]'
                               }`}
                             >
@@ -1307,12 +1337,12 @@ export function BusinessHomeScreen({
                       ].map((item) => (
                         <div
                           key={item.label}
-                          className="rounded-xl bg-[#0E2434] dark:bg-[#0E1826] border border-white/10 p-2.5 text-white"
+                          className="rounded-xl bg-gradient-to-br from-[#255973] to-[#183E53] border border-sky-200/25 p-2.5 text-white shadow-xs"
                         >
-                          <div className="font-display text-base font-bold text-[#F38B1E] tabular-nums">
+                          <div className="font-display text-base font-bold text-[#FFB057] tabular-nums">
                             {item.val}
                           </div>
-                          <div className="text-[10.5px] text-slate-300">
+                          <div className="text-[10.5px] text-sky-100/85">
                             {item.label}
                           </div>
                         </div>
@@ -1342,7 +1372,7 @@ export function BusinessHomeScreen({
                   <motion.div variants={itemVariants} className={`${glassCardClass} p-4 space-y-3`}>
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="w-7 h-7 rounded-lg bg-[#123142] text-[#F38B1E] flex items-center justify-center">
+                        <span className="w-7 h-7 rounded-lg bg-[#1E4B63] text-[#FFB057] flex items-center justify-center">
                           <MessageSquare className="w-4 h-4" />
                         </span>
                         <h2 className="font-display text-sm font-bold text-[#123142] dark:text-white">
@@ -1401,7 +1431,7 @@ export function BusinessHomeScreen({
                             className="rounded-2xl bg-[linear-gradient(135deg,rgba(255,255,255,0.85)_0%,rgba(244,247,252,0.75)_100%)] dark:bg-white/[0.05] border border-[#123142]/12 dark:border-white/10 p-3 space-y-2"
                           >
                             <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-xl bg-[#123142] text-[#F38B1E] flex items-center justify-center font-display text-[11px] font-bold">
+                              <div className="w-8 h-8 rounded-xl bg-[#1E4B63] text-[#FFB057] flex items-center justify-center font-display text-[11px] font-bold">
                                 {post.authorInitials}
                               </div>
                               <div className="min-w-0">
@@ -1738,47 +1768,6 @@ export function BusinessHomeScreen({
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* ============================================================== */}
-          {/* PRESERVED 3D BUSINESS STAGE DRAWER (Zero backdrop-filter)       */}
-          {/* ============================================================== */}
-          {show3DStageModal && (
-            <div
-              className="fixed inset-0 z-50 bg-[#050B12]/90 flex items-center justify-center p-3 sm:p-6"
-              onClick={() => setShow3DStageModal(false)}
-            >
-              <div
-                className="w-full max-w-md rounded-3xl overflow-hidden bg-[#0B1620] border border-white/15 shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="px-4 py-3 flex items-center justify-between border-b border-white/10 text-white">
-                  <span className="font-display text-sm font-bold">
-                    3D Business Core Stage
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShow3DStageModal(false)}
-                    aria-label="Close 3D Stage"
-                    className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <BusinessCoreStage3D
-                  connectionsCount={connectionsCount}
-                  visitorsCount={visitorsCount}
-                  referralsCount={referralsCount}
-                  meetingsCount={meetingsCount}
-                  testimonialsCount={testimonialsCount}
-                  reducedMotion={reducedMotion}
-                  onNavigate={(target) => {
-                    setShow3DStageModal(false);
-                    onNavigate(target);
-                  }}
-                />
-              </div>
-            </div>
-          )}
         </div>
       </SkeletonCrossfade>
     </PullToRefreshContainer>
@@ -2554,7 +2543,7 @@ export function MeetingsScreen({
               >
                 <div className="flex items-center gap-3">
                   <div className="w-11 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 text-center shrink-0">
-                    <div className="bg-[#123142] text-white text-[9px] font-bold py-0.5">{mt.dayShort}</div>
+                    <div className="bg-[#1E4B63] text-white text-[9px] font-bold py-0.5">{mt.dayShort}</div>
                     <div className="font-display text-sm font-bold text-slate-900 dark:text-white py-1 tabular-nums">
                       {mt.dayNum}
                     </div>
@@ -2780,8 +2769,8 @@ export function EventsScreen({
               className="rounded-2xl bg-white dark:bg-[#151519] border border-slate-200/80 dark:border-white/10 p-4 flex items-center justify-between gap-3"
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#123142] to-[#1C4962] text-white flex items-center justify-center shrink-0">
-                  <Ticket className="w-5 h-5 text-[#F59E0B]" />
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#245670] to-[#183E53] text-white flex items-center justify-center shrink-0">
+                  <Ticket className="w-5 h-5 text-[#FFB057]" />
                 </div>
                 <div className="min-w-0">
                   <div className="text-[11px] font-medium text-[#D85D27]">
