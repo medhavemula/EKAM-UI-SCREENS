@@ -1699,72 +1699,115 @@ export function GroupsHomeScreen({
         skeleton={<GroupsHubSkeleton reducedMotion={reducedMotion} />}
       >
         <div className="min-h-full bg-gradient-to-b from-[#ECEEF7]/85 via-[#F4F5FA] to-[#F8F9FC] dark:from-[#121622] dark:via-[#0B0D14] dark:to-[#0A0C12] pb-8">
-      {/* Architectural Header */}
-      <div className="relative bg-gradient-to-br from-[#0D2331] via-[#123142] to-[#173E52] px-5 pt-6 pb-5 text-white overflow-hidden">
+      {/* Groups Screen Midnight Navy Editorial Header (Matching Business & Professional) */}
+      <div className="relative bg-gradient-to-b from-[#060F1E] via-[#091930] to-[#122338] px-4 pt-4 pb-4 text-white overflow-hidden">
+        {/* Subtle ambient warm-orange lighting */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-14 -right-12 w-52 h-52 rounded-full bg-[radial-gradient(circle,rgba(243,139,30,0.24)_0%,rgba(216,93,39,0.06)_50%,transparent_75%)]"
+          className="pointer-events-none absolute right-2 -bottom-6 w-72 h-28 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(234,88,12,0.28)_0%,rgba(249,115,22,0.12)_50%,transparent_75%)] blur-xl"
         />
-        <ConstellationBackdrop />
 
-        <div className="relative z-10 flex items-start justify-between gap-3">
-          <div>
-            <h1 className="font-display text-2xl font-bold tracking-tight">Groups</h1>
-            <p className="mt-0.5 text-xs text-slate-300">Circles beyond your chapter</p>
-            <div className="mt-2.5 flex items-center gap-2 text-[11px] text-slate-300/90 tabular-nums">
-              <span>{myCount} Joined</span>
-              <span aria-hidden="true">·</span>
-              <span>{suggestedCount} Discover</span>
-              <span aria-hidden="true">·</span>
-              <span>{invitesCount} Invites</span>
-            </div>
-          </div>
+        {/* Editorial Abstract Waves & Light Beams Illustration */}
+        <EditorialHeaderBackdrop reducedMotion={reducedMotion} />
+
+        {/* TOP ROW: Chapter Location Left + Notification Bell Right */}
+        <div className="relative z-20 flex items-center justify-between">
+          <button
+            type="button"
+            className="flex items-center gap-1.5 text-[13px] font-medium text-white/95 hover:text-white transition-colors cursor-pointer"
+          >
+            <span className="tracking-[-0.01em]">Hyderabad – Fortune Chapter</span>
+            <ChevronDown className="w-3.5 h-3.5 text-white/80 shrink-0 mt-0.5" strokeWidth={2} />
+          </button>
 
           <button
             type="button"
-            onClick={() => onNavigate('group_create')}
-            className="h-10 px-3.5 rounded-xl bg-[#D85D27] hover:bg-[#BE4D14] text-white text-xs font-semibold shadow-lg shadow-[#D85D27]/25 inline-flex items-center gap-1.5 shrink-0 active:scale-[0.97] transition-all cursor-pointer"
+            onClick={() => onNavigate('notifications')}
+            aria-label="Notifications"
+            className="relative p-1 -mr-1 text-white/95 hover:text-white transition-colors cursor-pointer"
           >
-            <Plus className="w-4 h-4" strokeWidth={2.25} />
-            <span>Create</span>
+            <Bell className="w-[21px] h-[21px]" strokeWidth={1.9} />
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#FF7A2F] ring-1 ring-[#060F1E]" />
           </button>
         </div>
 
-        {/* Animated Segmented Tabs */}
-        <div className="relative z-10 mt-5 grid grid-cols-3 p-1 rounded-2xl bg-white/10 border border-white/12">
+        {/* MIDDLE ROW: Groups Heading & Subtitle Left + Warm Glass Plus Button Right */}
+        <div className="relative z-20 mt-3 mb-5 flex items-center justify-between gap-2">
+          <div className="min-w-0 pr-2">
+            <h1 className="font-display text-[33px] font-extrabold tracking-[-0.02em] leading-[1.08] text-white">
+              Groups
+            </h1>
+            <p className="mt-1.5 text-[13px] font-normal text-white/85 leading-snug truncate">
+              Circles beyond your chapter
+            </p>
+          </div>
+
+          <motion.button
+            type="button"
+            whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+            whileTap={reducedMotion ? undefined : { scale: 0.94 }}
+            onClick={() => onNavigate('group_create')}
+            aria-label="Create group"
+            className="relative z-30 w-[48px] h-[48px] rounded-full bg-[radial-gradient(circle_at_30%_25%,rgba(255,154,66,0.94)_0%,rgba(255,107,26,0.88)_55%,rgba(234,82,12,0.92)_100%)] backdrop-blur-md text-white border border-[#FFD1A8]/65 shadow-[0_6px_16px_rgba(0,0,0,0.28),inset_0_1px_3px_rgba(255,255,255,0.4)] flex items-center justify-center cursor-pointer shrink-0"
+          >
+            <Plus className="w-6 h-6 text-white" strokeWidth={2.2} />
+          </motion.button>
+        </div>
+
+        {/* BOTTOM ROW: Full-Width Rounded Pill Glass Navigation Bar (My groups | Suggested | Invites) */}
+        <div className="relative z-20 rounded-full bg-[linear-gradient(90deg,rgba(26,38,58,0.76)_0%,rgba(44,50,68,0.68)_52%,rgba(68,54,62,0.66)_100%)] backdrop-blur-xl border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.28),0_8px_24px_rgba(0,0,0,0.35)] p-1.5 flex items-center">
           {(
             [
-              { id: 'my', label: 'My groups', count: myCount },
-              { id: 'suggested', label: 'Suggested', count: suggestedCount },
-              { id: 'invites', label: 'Invites', count: invitesCount },
+              { id: 'my', label: 'My groups', count: myCount, icon: Layers, flexClass: 'flex-[1.15_1_0%]' },
+              { id: 'suggested', label: 'Suggested', count: suggestedCount, icon: Globe, flexClass: 'flex-[1.15_1_0%]' },
+              { id: 'invites', label: 'Invites', count: invitesCount, icon: UserPlus, flexClass: 'flex-[0.92_1_0%]' },
             ] as const
-          ).map((t) => {
+          ).map((t, index, arr) => {
             const active = tab === t.id;
+            const Icon = t.icon;
+            const nextItem = arr[index + 1];
+            const showDivider = index < arr.length - 1 && !active && (!nextItem || tab !== nextItem.id);
             return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={`relative py-2 px-1 rounded-xl text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1 whitespace-nowrap ${
-                  active ? 'text-slate-900' : 'text-slate-200 hover:text-white'
-                }`}
-              >
-                {active && (
-                  <motion.div
-                    layoutId="groups-home-tab"
-                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                    className="absolute inset-0 rounded-xl bg-white shadow-sm"
-                  />
-                )}
-                <span className="relative z-10">{t.label}</span>
-                <span
-                  className={`relative z-10 text-[10.5px] font-mono-tabular ${
-                    active ? 'text-[#D85D27]' : 'text-slate-300/80'
+              <React.Fragment key={t.id}>
+                <button
+                  type="button"
+                  onClick={() => setTab(t.id)}
+                  className={`relative z-10 min-w-0 ${t.flexClass} min-h-[40px] rounded-full text-[11.5px] transition-colors cursor-pointer flex items-center justify-center gap-1 px-2 whitespace-nowrap ${
+                    active ? 'text-[#101828] font-bold' : 'text-white/90 hover:text-white font-medium'
                   }`}
                 >
-                  {t.count}
-                </span>
-              </button>
+                  {active && (
+                    <motion.div
+                      layoutId="groups-home-tab"
+                      transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                      className="absolute inset-0 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center justify-center shrink-0">
+                    <Icon
+                      className={`w-[13.5px] h-[13.5px] ${
+                        active ? 'text-[#EA580C]' : 'text-white/85'
+                      }`}
+                      strokeWidth={1.9}
+                    />
+                  </span>
+                  <span className="relative z-10 tracking-[-0.01em]">{t.label}</span>
+                  <span
+                    className={`relative z-10 text-[10px] font-mono-tabular ${
+                      active ? 'text-[#EA580C] font-bold' : 'text-white/65'
+                    }`}
+                  >
+                    {t.count}
+                  </span>
+                </button>
+
+                {showDivider && (
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none h-4 w-px bg-white/22 shrink-0"
+                  />
+                )}
+              </React.Fragment>
             );
           })}
         </div>
