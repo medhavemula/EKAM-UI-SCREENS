@@ -83,6 +83,7 @@ export function ProfessionalHomeScreen({
   const [commentDraft, setCommentDraft] = useState('');
   const [showChapterBanner, setShowChapterBanner] = useState(true);
   const [expandedPostIds, setExpandedPostIds] = useState<Record<string, boolean>>({});
+  const [activeMonthIdx, setActiveMonthIdx] = useState<number>(5);
 
   const profPosts = posts.filter((p) => p.scope === 'professional');
   const myPostsCount = profPosts.filter((p) => p.authorInitials === user.initials).length;
@@ -135,19 +136,49 @@ export function ProfessionalHomeScreen({
     0
   );
 
-  // Derived 6-month activity bars anchored cleanly to live network totals
+  // Derived 6-month activity series anchored cleanly to live network totals
   const monthlySeries = [
-    { month: 'Jun', reach: 46, interactions: 32 },
-    { month: 'Jul', reach: 68, interactions: 48 },
-    { month: 'Aug', reach: 58, interactions: 62 },
-    { month: 'Sep', reach: 52, interactions: 38 },
-    { month: 'Oct', reach: 74, interactions: 44 },
+    { month: 'Jun', reach: 44, interactions: 30, linksCount: 3, postsCount: 14 },
+    { month: 'Jul', reach: 66, interactions: 48, linksCount: 4, postsCount: 21 },
+    { month: 'Aug', reach: 56, interactions: 64, linksCount: 4, postsCount: 27 },
+    { month: 'Sep', reach: 52, interactions: 38, linksCount: 5, postsCount: 18 },
+    { month: 'Oct', reach: 74, interactions: 46, linksCount: 5, postsCount: 24 },
     {
       month: 'Nov',
-      reach: Math.min(96, 56 + connectedMembers.length * 5),
-      interactions: Math.min(96, 36 + totalEngagements),
+      reach: Math.min(94, 56 + connectedMembers.length * 5),
+      interactions: Math.min(92, 36 + totalEngagements),
+      linksCount: connectedMembers.length,
+      postsCount: totalEngagements,
     },
   ];
+
+  const chartBottomY = 96;
+  const chartTopY = 14;
+  const chartPlotH = chartBottomY - chartTopY;
+  const buildSmoothPath = (pts: { x: number; y: number }[]) =>
+    pts.reduce((acc, pt, i, arr) => {
+      if (i === 0) return `M ${pt.x} ${pt.y}`;
+      const prev = arr[i - 1];
+      const midX = Number(((prev.x + pt.x) / 2).toFixed(1));
+      return `${acc} C ${midX} ${prev.y}, ${midX} ${pt.y}, ${pt.x} ${pt.y}`;
+    }, '');
+
+  const linksPoints = monthlySeries.map((item, i) => ({
+    x: Number((18 + (i / (monthlySeries.length - 1)) * 264).toFixed(1)),
+    y: Number((chartBottomY - (item.reach / 100) * chartPlotH).toFixed(1)),
+  }));
+  const postsPoints = monthlySeries.map((item, i) => ({
+    x: Number((18 + (i / (monthlySeries.length - 1)) * 264).toFixed(1)),
+    y: Number((chartBottomY - (item.interactions / 100) * chartPlotH).toFixed(1)),
+  }));
+
+  const linksLinePath = buildSmoothPath(linksPoints);
+  const linksAreaPath = `${linksLinePath} L ${linksPoints[linksPoints.length - 1].x} ${chartBottomY} L ${linksPoints[0].x} ${chartBottomY} Z`;
+  const postsLinePath = buildSmoothPath(postsPoints);
+  const postsAreaPath = `${postsLinePath} L ${postsPoints[postsPoints.length - 1].x} ${chartBottomY} L ${postsPoints[0].x} ${chartBottomY} Z`;
+  const activeMonth = monthlySeries[activeMonthIdx] || monthlySeries[monthlySeries.length - 1];
+  const activeLinksPt = linksPoints[activeMonthIdx] || linksPoints[linksPoints.length - 1];
+  const activePostsPt = postsPoints[activeMonthIdx] || postsPoints[postsPoints.length - 1];
 
   const cardClass =
     'rounded-[22px] bg-white dark:bg-[#161822] border border-slate-200/70 dark:border-white/10 shadow-[0_14px_34px_-12px_rgba(18,49,66,0.09),0_3px_10px_-3px_rgba(18,49,66,0.04)] dark:shadow-[0_18px_38px_-12px_rgba(0,0,0,0.68)]';
@@ -225,21 +256,23 @@ export function ProfessionalHomeScreen({
         </div>
 
         {/* BOTTOM ROW: Full-Width Rounded Pill Glass Navigation Bar (Feed | Connections | Profile) */}
-        <div className="relative z-20 rounded-full bg-[linear-gradient(90deg,rgba(26,38,58,0.76)_0%,rgba(44,50,68,0.68)_52%,rgba(68,54,62,0.66)_100%)] backdrop-blur-xl border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.28),0_8px_24px_rgba(0,0,0,0.35)] p-1.5 grid grid-cols-3 items-center">
+        <div className="relative z-20 rounded-full bg-[linear-gradient(90deg,rgba(26,38,58,0.76)_0%,rgba(44,50,68,0.68)_52%,rgba(68,54,62,0.66)_100%)] backdrop-blur-xl border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.28),0_8px_24px_rgba(0,0,0,0.35)] p-1.5 flex items-center">
           {(
             [
-              { id: 'feed', label: 'Feed' },
-              { id: 'connections', label: 'Connections' },
-              { id: 'profile', label: 'Profile' },
+              { id: 'feed', label: 'Feed', flexClass: 'flex-[0.82_1_0%]' },
+              { id: 'connections', label: 'Connections', flexClass: 'flex-[1.46_1_0%]' },
+              { id: 'profile', label: 'Profile', flexClass: 'flex-[0.88_1_0%]' },
             ] as const
-          ).map((item, index) => {
+          ).map((item, index, arr) => {
             const active = section === item.id;
+            const nextItem = arr[index + 1];
+            const showDivider = index < arr.length - 1 && !active && (!nextItem || section !== nextItem.id);
             return (
               <React.Fragment key={item.id}>
                 <button
                   type="button"
                   onClick={() => setSection(item.id)}
-                  className={`relative z-10 min-h-[40px] rounded-full text-[13px] transition-colors cursor-pointer flex items-center justify-center gap-2 px-2 ${
+                  className={`relative z-10 min-w-0 ${item.flexClass} min-h-[40px] rounded-full text-[12.5px] transition-colors cursor-pointer flex items-center justify-center gap-1.5 px-3 ${
                     active ? 'text-[#101828] font-bold' : 'text-white/90 hover:text-white font-medium'
                   }`}
                 >
@@ -257,7 +290,7 @@ export function ProfessionalHomeScreen({
                       <svg
                         viewBox="0 0 20 20"
                         fill="none"
-                        className={`w-[17px] h-[17px] ${active ? 'text-[#EA580C]' : 'text-white/85'}`}
+                        className={`w-[15px] h-[15px] ${active ? 'text-[#EA580C]' : 'text-white/85'}`}
                       >
                         <rect
                           x="2.5"
@@ -299,27 +332,26 @@ export function ProfessionalHomeScreen({
                     )}
                     {item.id === 'connections' && (
                       <Users
-                        className={`w-[17px] h-[17px] ${active ? 'text-[#EA580C]' : 'text-white/85'}`}
-                        strokeWidth={1.85}
+                        className={`w-[15px] h-[15px] ${active ? 'text-[#EA580C]' : 'text-white/85'}`}
+                        strokeWidth={1.9}
                       />
                     )}
                     {item.id === 'profile' && (
                       <User
-                        className={`w-[17px] h-[17px] ${active ? 'text-[#EA580C]' : 'text-white/85'}`}
-                        strokeWidth={1.85}
+                        className={`w-[15px] h-[15px] ${active ? 'text-[#EA580C]' : 'text-white/85'}`}
+                        strokeWidth={1.9}
                       />
                     )}
                   </span>
 
-                  <span className="relative z-10 tracking-[-0.01em]">{item.label}</span>
+                  <span className="relative z-10 tracking-[-0.01em] whitespace-nowrap">{item.label}</span>
                 </button>
 
-                {/* Subtle vertical divider between segments */}
-                {index < 2 && (
+                {/* Subtle vertical divider between inactive segments */}
+                {showDivider && (
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute top-1/2 -translate-y-1/2 h-4 w-px bg-white/22"
-                    style={{ left: `${((index + 1) * 100) / 3}%` }}
+                    className="pointer-events-none h-4 w-px bg-white/22 shrink-0"
                   />
                 )}
               </React.Fragment>
@@ -701,8 +733,8 @@ export function ProfessionalHomeScreen({
           animate="visible"
           className="px-4 pt-5 space-y-4"
         >
-          {/* Network Pulse Bar Chart Card (Directly Inspired by Pin's Statistic Card) */}
-          <motion.div variants={fadeInUpVariants} className={`${cardClass} p-4 space-y-4`}>
+          {/* Network Activity — Dual-Series Smooth Area & Spline Trend Graph */}
+          <motion.div variants={fadeInUpVariants} className={`${cardClass} p-4 space-y-3`}>
             <div className="flex items-start justify-between gap-2">
               <div>
                 <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
@@ -712,37 +744,181 @@ export function ProfessionalHomeScreen({
                   {connectedMembers.length + totalEngagements} Touchpoints
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-[11px] font-medium text-slate-500 dark:text-slate-400 pt-1">
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-xs bg-[#123142] dark:bg-sky-400" />
-                  <span>Links</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-xs bg-[#D85D27]" />
-                  <span>Posts</span>
-                </span>
+              <div className="flex flex-col items-end gap-1 pt-0.5">
+                <div className="flex items-center gap-3 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#1E4B63] dark:bg-sky-400" />
+                    <span>Links</span>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#D85D27]" />
+                    <span>Posts</span>
+                  </span>
+                </div>
+                <div className="text-[10.5px] font-semibold text-slate-500 dark:text-slate-400 tabular-nums">
+                  <span className="text-slate-800 dark:text-slate-200">{activeMonth.month}:</span>{' '}
+                  <span className="text-[#1E4B63] dark:text-sky-400">{activeMonth.linksCount} links</span>
+                  {' · '}
+                  <span className="text-[#D85D27] dark:text-[#FF8A42]">{activeMonth.postsCount} posts</span>
+                </div>
               </div>
             </div>
 
-            {/* Dual Capsule Bar Comparison */}
-            <div className="grid grid-cols-6 gap-2.5 items-end h-28 pt-2">
-              {monthlySeries.map((bar) => (
-                <div key={bar.month} className="flex flex-col items-center gap-1.5 h-full justify-end">
-                  <div className="flex items-end justify-center gap-1 w-full flex-1">
-                    <div
-                      className="w-2 rounded-full bg-[#D85D27] transition-all duration-300"
-                      style={{ height: `${bar.interactions}%` }}
-                    />
-                    <div
-                      className="w-2 rounded-full bg-[#123142] dark:bg-sky-400 transition-all duration-300"
-                      style={{ height: `${bar.reach}%` }}
-                    />
-                  </div>
-                  <span className="text-[10.5px] font-medium text-slate-400 dark:text-slate-500">
-                    {bar.month}
-                  </span>
-                </div>
-              ))}
+            {/* Dual Smooth Spline & Area Chart */}
+            <div className="pt-1">
+              <svg
+                viewBox="0 0 300 104"
+                className="w-full h-[108px] overflow-visible"
+                role="img"
+                aria-label="Network activity trend showing Links and Posts from June to November"
+              >
+                <defs>
+                  <linearGradient id="ekamProfLinksGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#1E4B63" stopOpacity="0.22" />
+                    <stop offset="100%" stopColor="#1E4B63" stopOpacity="0" />
+                  </linearGradient>
+                  <linearGradient id="ekamProfPostsGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#EA580C" stopOpacity="0.20" />
+                    <stop offset="100%" stopColor="#EA580C" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+
+                {/* Horizontal subtle gridlines */}
+                {[26, 50, 74].map((y) => (
+                  <line
+                    key={y}
+                    x1="12"
+                    y1={y}
+                    x2="288"
+                    y2={y}
+                    className="stroke-slate-200/80 dark:stroke-white/10"
+                    strokeWidth="1"
+                    strokeDasharray="3 3"
+                  />
+                ))}
+                <line
+                  x1="12"
+                  y1={chartBottomY}
+                  x2="288"
+                  y2={chartBottomY}
+                  className="stroke-slate-200 dark:stroke-white/12"
+                  strokeWidth="1"
+                />
+
+                {/* Soft area fills */}
+                <path d={linksAreaPath} fill="url(#ekamProfLinksGrad)" />
+                <path d={postsAreaPath} fill="url(#ekamProfPostsGrad)" />
+
+                {/* Active vertical focus guide */}
+                <line
+                  x1={activeLinksPt.x}
+                  y1={chartTopY - 4}
+                  x2={activeLinksPt.x}
+                  y2={chartBottomY}
+                  className="stroke-slate-300 dark:stroke-white/20"
+                  strokeWidth="1"
+                  strokeDasharray="2.5 2.5"
+                />
+
+                {/* Smooth spline curves */}
+                <path
+                  d={linksLinePath}
+                  fill="none"
+                  className="stroke-[#1E4B63] dark:stroke-sky-400"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d={postsLinePath}
+                  fill="none"
+                  className="stroke-[#D85D27] dark:stroke-[#FF8A42]"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Data nodes & interactive hit zones */}
+                {monthlySeries.map((item, idx) => {
+                  const lp = linksPoints[idx];
+                  const pp = postsPoints[idx];
+                  const isActive = idx === activeMonthIdx;
+                  return (
+                    <g
+                      key={item.month}
+                      onClick={() => setActiveMonthIdx(idx)}
+                      onMouseEnter={() => setActiveMonthIdx(idx)}
+                      className="cursor-pointer"
+                    >
+                      <rect
+                        x={lp.x - 24}
+                        y={0}
+                        width={48}
+                        height={104}
+                        fill="transparent"
+                      />
+                      {isActive ? (
+                        <>
+                          <circle cx={lp.x} cy={lp.y} r="7" className="fill-[#1E4B63]/16 dark:fill-sky-400/20" />
+                          <circle
+                            cx={lp.x}
+                            cy={lp.y}
+                            r="3.8"
+                            className="fill-[#1E4B63] dark:fill-sky-400 stroke-white dark:stroke-[#161822]"
+                            strokeWidth="2"
+                          />
+                          <circle cx={pp.x} cy={pp.y} r="7" className="fill-[#D85D27]/18 dark:fill-[#FF8A42]/22" />
+                          <circle
+                            cx={pp.x}
+                            cy={pp.y}
+                            r="3.8"
+                            className="fill-[#D85D27] dark:fill-[#FF8A42] stroke-white dark:stroke-[#161822]"
+                            strokeWidth="2"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <circle
+                            cx={lp.x}
+                            cy={lp.y}
+                            r="2.4"
+                            className="fill-white dark:fill-[#161822] stroke-[#1E4B63] dark:stroke-sky-400"
+                            strokeWidth="1.6"
+                          />
+                          <circle
+                            cx={pp.x}
+                            cy={pp.y}
+                            r="2.4"
+                            className="fill-white dark:fill-[#161822] stroke-[#D85D27] dark:stroke-[#FF8A42]"
+                            strokeWidth="1.6"
+                          />
+                        </>
+                      )}
+                    </g>
+                  );
+                })}
+              </svg>
+
+              {/* Interactive Month Axis */}
+              <div className="grid grid-cols-6 mt-1.5">
+                {monthlySeries.map((item, idx) => {
+                  const isActive = idx === activeMonthIdx;
+                  return (
+                    <button
+                      key={item.month}
+                      type="button"
+                      onClick={() => setActiveMonthIdx(idx)}
+                      className={`py-0.5 text-[10.5px] rounded-md transition-colors cursor-pointer ${
+                        isActive
+                          ? 'font-bold text-[#1E4B63] dark:text-white bg-slate-100/90 dark:bg-white/10'
+                          : 'font-medium text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                      }`}
+                    >
+                      {item.month}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </motion.div>
 
@@ -916,7 +1092,7 @@ export function ProfessionalHomeScreen({
                       <span>{m.status === 'received' ? 'Accept' : 'Connect'}</span>
                     </PremiumButton>
                   ) : m.status === 'sent' ? (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 dark:text-slate-500 shrink-0">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400 shrink-0">
                       <Clock className="w-3.5 h-3.5" />
                       <span>Sent</span>
                     </span>

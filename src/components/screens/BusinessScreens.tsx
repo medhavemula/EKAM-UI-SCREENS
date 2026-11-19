@@ -367,23 +367,27 @@ export function BusinessHomeScreen({
             </div>
 
             {/* BOTTOM ROW: Full-Width Rounded Pill Glass Navigation Bar (Opportunities | Connections | Chapter) */}
-            <div className="relative z-20 rounded-full bg-[linear-gradient(90deg,rgba(26,38,58,0.76)_0%,rgba(44,50,68,0.68)_52%,rgba(68,54,62,0.66)_100%)] backdrop-blur-xl border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.28),0_8px_24px_rgba(0,0,0,0.35)] p-1 flex items-center">
+            <div className="relative z-20 -mx-1 rounded-full bg-[linear-gradient(90deg,rgba(26,38,58,0.78)_0%,rgba(44,50,68,0.7)_52%,rgba(68,54,62,0.68)_100%)] backdrop-blur-xl border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.28),0_8px_24px_rgba(0,0,0,0.35)] p-1 flex items-center">
               {(
                 [
-                  { id: 'opportunities', label: 'Opportunities', icon: Briefcase, flexClass: 'flex-[1.22_1_0%]' },
-                  { id: 'network', label: 'Connections', icon: Users, flexClass: 'flex-[1.18_1_0%]' },
-                  { id: 'chapter', label: 'Chapter', icon: Building2, flexClass: 'flex-[0.86_1_0%]' },
+                  { id: 'opportunities', label: 'Opportunities', icon: Briefcase },
+                  { id: 'network', label: 'Connections', icon: Users },
+                  { id: 'chapter', label: 'Chapter', icon: Building2 },
                 ] as const
-              ).map((item, index) => {
+              ).map((item, index, arr) => {
                 const active = section === item.id;
                 const Icon = item.icon;
+                const nextItem = arr[index + 1];
+                const showDivider = index < arr.length - 1 && !active && (!nextItem || section !== nextItem.id);
                 return (
                   <React.Fragment key={item.id}>
                     <button
                       type="button"
                       onClick={() => selectSection(item.id)}
-                      className={`relative z-10 min-w-0 ${item.flexClass} min-h-[40px] rounded-full text-[11px] transition-colors cursor-pointer flex items-center justify-center gap-1 px-1.5 ${
-                        active ? 'text-[#101828] font-bold' : 'text-white/90 hover:text-white font-medium'
+                      className={`relative z-10 min-h-[42px] rounded-full text-[11px] transition-colors cursor-pointer flex items-center justify-center ${
+                        active
+                          ? 'flex-[1_0_auto] px-4 gap-1.5 text-[#101828] font-bold'
+                          : 'flex-[1_1_auto] px-2 gap-1 text-white/90 hover:text-white font-medium'
                       }`}
                     >
                       {active && (
@@ -403,16 +407,16 @@ export function BusinessHomeScreen({
                           className={`w-[13px] h-[13px] ${
                             active ? 'text-[#EA580C]' : 'text-white/85'
                           }`}
-                          strokeWidth={1.9}
+                          strokeWidth={2}
                         />
                       </span>
 
-                      <span className="relative z-10 tracking-[-0.015em] whitespace-nowrap">
+                      <span className="relative z-10 tracking-[-0.01em] whitespace-nowrap">
                         {item.label}
                       </span>
                     </button>
 
-                    {index < 2 && (
+                    {showDivider && (
                       <span
                         aria-hidden="true"
                         className="pointer-events-none h-4 w-px bg-white/22 shrink-0"
@@ -925,21 +929,21 @@ export function BusinessHomeScreen({
                             key={tab.id}
                             type="button"
                             onClick={() => setNetworkTab(tab.id)}
-                            className={`rounded-2xl p-2.5 text-left border transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                            className={`rounded-2xl px-2.5 py-2 text-left border transition-all cursor-pointer flex items-center justify-between gap-1.5 ${
                               active
                                 ? 'bg-gradient-to-r from-[#FF7A29] to-[#D85D27] border-transparent text-white shadow-[0_8px_18px_-4px_rgba(216,93,39,0.45)]'
                                 : 'bg-[#F4F6FA] dark:bg-white/[0.05] border-[#123142]/10 dark:border-white/10 text-[#123142] dark:text-slate-300'
                             }`}
                           >
-                            <div className="flex items-center gap-2 min-w-0">
+                            <div className="flex items-center gap-1.5 min-w-0">
                               <TabIcon
-                                className={`w-3.5 h-3.5 shrink-0 ${
+                                className={`w-3 h-3 shrink-0 ${
                                   active ? 'text-[#0E2434]' : 'text-[#D85D27]'
                                 }`}
                               />
-                              <span className="text-[11px] font-semibold truncate">{tab.label}</span>
+                              <span className="text-[10px] font-semibold tracking-[-0.01em] whitespace-nowrap">{tab.label}</span>
                             </div>
-                            <span className="font-mono-tabular text-xs font-bold shrink-0">
+                            <span className="font-mono-tabular text-[11px] font-bold shrink-0">
                               {tab.count}
                             </span>
                           </button>
@@ -1005,9 +1009,9 @@ export function BusinessHomeScreen({
                                   onStartChat ? onStartChat(m) : onNavigate('messages')
                                 }
                                 aria-label={`Message ${m.name}`}
-                                className="w-9 h-9 rounded-xl bg-[#1E4B63] hover:bg-[#163C52] text-[#FF922E] shadow-xs flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+                                className="w-9 h-9 rounded-xl bg-[#1E4B63] hover:bg-[#163C52] text-[#FFB057] shadow-xs flex items-center justify-center shrink-0 cursor-pointer transition-colors"
                               >
-                                <MessageSquare className="w-4 h-4 fill-current" />
+                                <MessageSquare className="w-4 h-4" />
                               </button>
                             )}
                           </div>
