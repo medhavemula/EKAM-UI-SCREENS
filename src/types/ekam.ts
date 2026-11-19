@@ -40,6 +40,10 @@ export type ScreenId =
   | 'groups_home'
   | 'group_create'
   | 'group_view'
+  | 'service_home'
+  | 'service_event_detail'
+  | 'service_add_event'
+  | 'service_chat'
   | 'service_locked';
 
 export interface UserProfile {
@@ -142,6 +146,43 @@ export interface EventItem {
   attendees: number;
   rsvped: boolean;
   creditsEligible?: boolean;
+}
+
+export interface ServiceEventDonation {
+  id: string;
+  donorName: string;
+  donorInitials: string;
+  amountInr: number;
+  dateLabel: string;
+  note?: string;
+}
+
+export interface ServiceEventItem {
+  id: string;
+  title: string;
+  dayNum: string;
+  monthShort: string;
+  dateLabel: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  chapter: string;
+  country: string;
+  region: string;
+  eventType: string;
+  category: string;
+  mode: 'In Person' | 'Virtual';
+  contactPerson: string;
+  checkedIn: boolean;
+  isMine: boolean;
+  isUpcoming: boolean;
+  monogram: string;
+  visualKind: 'monogram' | 'blood_donation' | 'community';
+  photoDataUrl?: string;
+  members: { id: string; name: string; initials: string; company: string; role: string }[];
+  volunteers: { id: string; name: string; initials: string; role: string }[];
+  donations: ServiceEventDonation[];
 }
 
 export interface TestimonialItem {

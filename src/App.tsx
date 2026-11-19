@@ -8,6 +8,9 @@ import {
   INITIAL_P2P_SESSIONS,
   INITIAL_POSTS,
   INITIAL_REFERRALS,
+  INITIAL_SERVICE_CONNECTIONS,
+  INITIAL_SERVICE_EVENTS,
+  INITIAL_SERVICE_THREADS,
   INITIAL_TESTIMONIALS,
   INITIAL_THREADS,
   INITIAL_USER,
@@ -23,6 +26,7 @@ import {
   PostItem,
   ReferralItem,
   ScreenId,
+  ServiceEventItem,
   StudioView,
   TestimonialItem,
   ThemeMode,
@@ -60,6 +64,9 @@ export default function App() {
   const [groups, setGroups] = useState<GroupItem[]>(INITIAL_GROUPS);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [threads, setThreads] = useState<ChatThread[]>(INITIAL_THREADS);
+  const [serviceEvents, setServiceEvents] = useState<ServiceEventItem[]>(INITIAL_SERVICE_EVENTS);
+  const [serviceConnections, setServiceConnections] = useState<ConnectionMember[]>(INITIAL_SERVICE_CONNECTIONS);
+  const [serviceThreads, setServiceThreads] = useState<ChatThread[]>(INITIAL_SERVICE_THREADS);
   const [creditsInr, setCreditsInr] = useState<number>(0);
 
   // Branded initial hydration & sign-in data-fetch loading state
@@ -284,6 +291,136 @@ export default function App() {
     );
   };
 
+  const handleCreateServiceEvent = (ev: Omit<ServiceEventItem, 'id'>) => {
+    setServiceEvents((prev) => [{ ...ev, id: `sev-${Date.now()}` }, ...prev]);
+  };
+
+  const handleToggleServiceCheckIn = (eventId: string) => {
+    setServiceEvents((prev) =>
+      prev.map((ev) => {
+        if (ev.id !== eventId) return ev;
+        const nextCheckedIn = !ev.checkedIn;
+        const hasMe = ev.members.some((m) => m.name === user.fullName);
+        const nextMembers = nextCheckedIn
+          ? hasMe
+            ? ev.members
+            : [
+                {
+                  id: `sm-${Date.now()}`,
+                  name: user.fullName,
+                  initials: user.initials,
+                  company: user.businessName,
+                  role: 'Member',
+                },
+                ...ev.members,
+              ]
+          : ev.members.filter((m) => m.name !== user.fullName);
+        return { ...ev, checkedIn: nextCheckedIn, members: nextMembers };
+      })
+    );
+  };
+
+  const handleToggleServiceVolunteer = (eventId: string) => {
+    setServiceEvents((prev) =>
+      prev.map((ev) => {
+        if (ev.id !== eventId) return ev;
+        const exists = ev.volunteers.some((v) => v.name === user.fullName);
+        return {
+          ...ev,
+          volunteers: exists
+            ? ev.volunteers.filter((v) => v.name !== user.fullName)
+            : [
+                {
+                  id: `sv-${Date.now()}`,
+                  name: user.fullName,
+                  initials: user.initials,
+                  role: 'Event Volunteer',
+                },
+                ...ev.volunteers,
+              ],
+        };
+      })
+    );
+  };
+
+  const handleAddServiceDonation = (eventId: string, amountInr: number, note: string) => {
+    setServiceEvents((prev) =>
+      prev.map((ev) =>
+        ev.id === eventId
+          ? {
+              ...ev,
+              donations: [
+                {
+                  id: `sd-${Date.now()}`,
+                  donorName: user.fullName,
+                  donorInitials: user.initials,
+                  amountInr,
+                  dateLabel: 'Just now',
+                  note,
+                },
+                ...ev.donations,
+              ],
+            }
+          : ev
+      )
+    );
+  };
+
+  const handleConnectServiceMember = (memberId: string) => {
+    setServiceConnections((prev) =>
+      prev.map((m) =>
+        m.id === memberId
+          ? { ...m, status: m.status === 'received' ? 'connected' : 'sent' }
+          : m
+      )
+    );
+  };
+
+  const handleSendServiceMessage = (threadId: string, text: string) => {
+    const now = new Date();
+    const hours = now.getHours();
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    const suffix = hours >= 12 ? 'pm' : 'am';
+    const h12 = hours % 12 || 12;
+    const formattedTime = `${h12}:${mins} ${suffix}`;
+    setServiceThreads((prev) =>
+      prev.map((th) =>
+        th.id === threadId
+          ? {
+              ...th,
+              unread: 0,
+              messages: [
+                ...th.messages,
+                { id: `smsg-${Date.now()}`, sender: 'me', text, time: formattedTime },
+              ],
+            }
+          : th
+      )
+    );
+  };
+
+  const handleStartServiceChat = (member: ConnectionMember): string => {
+    const existing = serviceThreads.find(
+      (th) => th.memberId === member.id || th.memberName.toLowerCase() === member.name.toLowerCase()
+    );
+    if (existing) return existing.id;
+    const newId = `sth-${member.id}`;
+    setServiceThreads((prev) => [
+      {
+        id: newId,
+        memberId: member.id,
+        memberName: member.name,
+        memberInitials: member.initials,
+        company: member.company,
+        chapter: member.chapter,
+        unread: 0,
+        messages: [],
+      },
+      ...prev,
+    ]);
+    return newId;
+  };
+
   const is3D = studioView === 'network3d';
 
   return (
@@ -426,6 +563,16 @@ export default function App() {
             }
             threads={threads}
             onSendMessage={handleSendMessage}
+            serviceEvents={serviceEvents}
+            onCreateServiceEvent={handleCreateServiceEvent}
+            onToggleServiceCheckIn={handleToggleServiceCheckIn}
+            onToggleServiceVolunteer={handleToggleServiceVolunteer}
+            onAddServiceDonation={handleAddServiceDonation}
+            serviceConnections={serviceConnections}
+            onConnectServiceMember={handleConnectServiceMember}
+            serviceThreads={serviceThreads}
+            onSendServiceMessage={handleSendServiceMessage}
+            onStartServiceChat={handleStartServiceChat}
             creditsInr={creditsInr}
             onEarnCredit={() => setCreditsInr((c) => c + 500)}
             theme={theme}

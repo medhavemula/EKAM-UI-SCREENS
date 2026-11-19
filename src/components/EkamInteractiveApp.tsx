@@ -4,15 +4,14 @@ import {
   Briefcase,
   Compass,
   Eye,
+  HeartHandshake,
   Home,
   Layers,
-  Lock,
   Monitor,
   Plus,
   Smartphone,
   Star,
   UserPlus,
-  Users,
   X,
 } from 'lucide-react';
 import { ScreenSkeletonRouter, SkeletonCrossfade } from './EkamSkeletons';
@@ -28,6 +27,7 @@ import {
   PostItem,
   ReferralItem,
   ScreenId,
+  ServiceEventItem,
   TestimonialItem,
   ThemeMode,
   UserProfile,
@@ -54,10 +54,15 @@ import {
   CreateGroupScreen,
   GroupsHomeScreen,
   ProfessionalHomeScreen,
-  ServiceLockedScreen,
   ViewGroupScreen,
   WritePostScreen,
 } from './screens/CommunityScreens';
+import {
+  ServiceAddEventScreen,
+  ServiceChatScreen,
+  ServiceClubScreen,
+  ServiceEventDetailScreen,
+} from './screens/ServiceScreens';
 import {
   AppearanceSettingsScreen,
   DeleteAccountScreen,
@@ -103,6 +108,16 @@ interface EkamInteractiveAppProps {
   onMarkNotificationRead: (id: string) => void;
   threads: ChatThread[];
   onSendMessage: (threadId: string, text: string) => void;
+  serviceEvents: ServiceEventItem[];
+  onCreateServiceEvent: (ev: Omit<ServiceEventItem, 'id'>) => void;
+  onToggleServiceCheckIn: (eventId: string) => void;
+  onToggleServiceVolunteer: (eventId: string) => void;
+  onAddServiceDonation: (eventId: string, amountInr: number, note: string) => void;
+  serviceConnections: ConnectionMember[];
+  onConnectServiceMember: (memberId: string) => void;
+  serviceThreads: ChatThread[];
+  onSendServiceMessage: (threadId: string, text: string) => void;
+  onStartServiceChat: (member: ConnectionMember) => string;
   creditsInr: number;
   onEarnCredit: () => void;
   theme: ThemeMode;
@@ -118,7 +133,7 @@ const TAB_ROOTS: Record<AppTab, ScreenId> = {
   business: 'business_home',
   professional: 'prof_home',
   home: 'dashboard',
-  service: 'service_locked',
+  service: 'service_home',
   groups: 'groups_home',
 };
 
@@ -142,7 +157,9 @@ function activeTabForScreen(screen: ScreenId): AppTab {
   }
   if (['prof_home', 'prof_write_post'].includes(screen)) return 'professional';
   if (['groups_home', 'group_create', 'group_view'].includes(screen)) return 'groups';
-  if (screen === 'service_locked') return 'service';
+  if (['service_home', 'service_event_detail', 'service_add_event', 'service_chat', 'service_locked'].includes(screen)) {
+    return 'service';
+  }
   return 'home';
 }
 
@@ -151,6 +168,7 @@ const SHOW_BOTTOM_BAR_SCREENS: ScreenId[] = [
   'business_home',
   'prof_home',
   'groups_home',
+  'service_home',
   'service_locked',
 ];
 
@@ -162,6 +180,7 @@ const INTERNAL_SKELETON_SCREENS: ScreenId[] = [
   'prof_home',
   'groups_home',
   'group_view',
+  'service_home',
 ];
 
 const SCREEN_GROUPS: { title: string; items: { id: ScreenId; label: string }[] }[] = [
@@ -191,13 +210,15 @@ const SCREEN_GROUPS: { title: string; items: { id: ScreenId; label: string }[] }
     ],
   },
   {
-    title: 'Professional & Groups',
+    title: 'Professional, Service & Groups',
     items: [
       { id: 'prof_home', label: 'Professional' },
       { id: 'prof_write_post', label: 'Write Post' },
+      { id: 'service_home', label: 'Service Club' },
+      { id: 'service_event_detail', label: 'View Service Event' },
+      { id: 'service_add_event', label: 'Add Service Event' },
       { id: 'groups_home', label: 'Groups' },
       { id: 'group_create', label: 'Create Group' },
-      { id: 'service_locked', label: 'Service (Locked)' },
     ],
   },
   {
@@ -251,6 +272,16 @@ export function EkamInteractiveApp(props: EkamInteractiveAppProps) {
     onMarkNotificationRead,
     threads,
     onSendMessage,
+    serviceEvents,
+    onCreateServiceEvent,
+    onToggleServiceCheckIn,
+    onToggleServiceVolunteer,
+    onAddServiceDonation,
+    serviceConnections,
+    onConnectServiceMember,
+    serviceThreads,
+    onSendServiceMessage,
+    onStartServiceChat,
     creditsInr,
     onEarnCredit,
     theme,
@@ -269,6 +300,11 @@ export function EkamInteractiveApp(props: EkamInteractiveAppProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [activeGroupId, setActiveGroupId] = useState<string>(groups[0]?.id || 'g-1');
+  const [activeServiceEventId, setActiveServiceEventId] = useState<string>(serviceEvents[0]?.id || 'sev-1');
+  const [activeServiceThreadId, setActiveServiceThreadId] = useState<string>(serviceThreads[0]?.id || 'st-1');
+  const [serviceInitialTab, setServiceInitialTab] = useState<
+    'activities' | 'events' | 'connections' | 'messages'
+  >('activities');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const effectiveLoading = isAppLoading || previewLoading || isRefreshing;
@@ -620,8 +656,128 @@ export function EkamInteractiveApp(props: EkamInteractiveAppProps) {
           />
         );
       }
+      case 'service_home':
       case 'service_locked':
-        return <ServiceLockedScreen onReturnHome={() => onNavigate('dashboard')} />;
+        return (
+          <ServiceClubScreen
+            key={serviceInitialTab}
+            user={user}
+            events={serviceEvents}
+            connections={serviceConnections}
+            threads={serviceThreads}
+            initialTab={serviceInitialTab}
+            onSelectEvent={(eventId) => {
+              setActiveServiceEventId(eventId);
+              onNavigate('service_event_detail');
+            }}
+            onOpenChatThread={(threadId) => {
+              setActiveServiceThreadId(threadId);
+              onNavigate('service_chat');
+            }}
+            onConnectMember={onConnectServiceMember}
+            onStartServiceChat={onStartServiceChat}
+            onNavigate={onNavigate}
+            reducedMotion={reducedMotion}
+            isLoading={effectiveLoading}
+            onRefresh={handleScreenRefresh}
+          />
+        );
+      case 'service_chat': {
+        const activeServiceThread =
+          serviceThreads.find((t) => t.id === activeServiceThreadId) || serviceThreads[0];
+        if (!activeServiceThread) {
+          return (
+            <ServiceClubScreen
+              user={user}
+              events={serviceEvents}
+              connections={serviceConnections}
+              threads={serviceThreads}
+              initialTab="messages"
+              onSelectEvent={(eventId) => {
+                setActiveServiceEventId(eventId);
+                onNavigate('service_event_detail');
+              }}
+              onOpenChatThread={(threadId) => {
+                setActiveServiceThreadId(threadId);
+                onNavigate('service_chat');
+              }}
+              onConnectMember={onConnectServiceMember}
+              onStartServiceChat={onStartServiceChat}
+              onNavigate={onNavigate}
+              reducedMotion={reducedMotion}
+              isLoading={effectiveLoading}
+              onRefresh={handleScreenRefresh}
+            />
+          );
+        }
+        return (
+          <ServiceChatScreen
+            thread={activeServiceThread}
+            onSendMessage={onSendServiceMessage}
+            onBack={() => {
+              setServiceInitialTab('messages');
+              onNavigate('service_home');
+            }}
+          />
+        );
+      }
+      case 'service_event_detail': {
+        const selectedEvent =
+          serviceEvents.find((ev) => ev.id === activeServiceEventId) || serviceEvents[0];
+        if (!selectedEvent) {
+          return (
+            <ServiceClubScreen
+              user={user}
+              events={serviceEvents}
+              connections={serviceConnections}
+              threads={serviceThreads}
+              initialTab="events"
+              onSelectEvent={(eventId) => {
+                setActiveServiceEventId(eventId);
+                onNavigate('service_event_detail');
+              }}
+              onOpenChatThread={(threadId) => {
+                setActiveServiceThreadId(threadId);
+                onNavigate('service_chat');
+              }}
+              onConnectMember={onConnectServiceMember}
+              onStartServiceChat={onStartServiceChat}
+              onNavigate={onNavigate}
+              reducedMotion={reducedMotion}
+              isLoading={effectiveLoading}
+              onRefresh={handleScreenRefresh}
+            />
+          );
+        }
+        return (
+          <ServiceEventDetailScreen
+            event={selectedEvent}
+            user={user}
+            onToggleCheckIn={onToggleServiceCheckIn}
+            onToggleVolunteer={onToggleServiceVolunteer}
+            onAddDonation={onAddServiceDonation}
+            onBack={() => {
+              setServiceInitialTab('events');
+              onNavigate('service_home');
+            }}
+          />
+        );
+      }
+      case 'service_add_event':
+        return (
+          <ServiceAddEventScreen
+            user={user}
+            onCreateEvent={(ev) => {
+              onCreateServiceEvent(ev);
+              setServiceInitialTab('events');
+              onNavigate('service_home');
+            }}
+            onBack={() => {
+              setServiceInitialTab('events');
+              onNavigate('service_home');
+            }}
+          />
+        );
       case 'profile':
         return (
           <ProfileScreen
@@ -698,7 +854,7 @@ export function EkamInteractiveApp(props: EkamInteractiveAppProps) {
     { id: 'business', label: 'Business', icon: Briefcase },
     { id: 'professional', label: 'Professional', icon: Compass },
     { id: 'home', label: currentTab === 'home' ? 'Actions' : 'Home', icon: Home },
-    { id: 'service', label: 'Service', icon: Users, locked: true },
+    { id: 'service', label: 'Service', icon: HeartHandshake },
     { id: 'groups', label: 'Groups', icon: Layers },
   ] as const;
 
@@ -944,9 +1100,6 @@ export function EkamInteractiveApp(props: EkamInteractiveAppProps) {
                     className="relative mb-0.5"
                   >
                     <Icon className="w-4.5 h-4.5" strokeWidth={1.85} />
-                    {'locked' in tab && tab.locked && (
-                      <Lock className="w-2.5 h-2.5 absolute -top-1 -right-1.5 text-slate-400" />
-                    )}
                   </motion.div>
                   <span
                     className={`text-[10px] leading-tight whitespace-nowrap tracking-[-0.015em] transition-colors ${
@@ -978,7 +1131,7 @@ export function EkamInteractiveApp(props: EkamInteractiveAppProps) {
             EKAM Interactive Redesign Studio
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Live interactive flows across Business, Professional, Groups, Messaging, Auth &amp; Settings
+            Live interactive flows across Business, Professional, Service Club, Groups, Messaging, Auth &amp; Settings
           </p>
         </div>
 
